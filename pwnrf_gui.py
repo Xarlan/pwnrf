@@ -5,72 +5,41 @@
 import tkinter as tk
 from tkinter import ttk
 
-# class PwnRfApp(tk.Frame):
-#
-#
-#
-# def main():
-#     window = tkinter.Tk()
-#     window.title("Welcome title")
-#     window.mainloop()
-#
-#
-# if __name__ == '__main__':
-#     main()
 
-# class MyFirstGUI:
-#     def __init__(self, master):
-#         self.master = master
-#         master.title("A simple GUI")
-#
-#         self.label = tk.Label(master, text="This is our first GUI!")
-#         self.label.pack()
-#
-#         self.greet_button = tk.Button(master, text="Greet", command=self.greet)
-#         self.greet_button.pack()
-#
-#         self.close_button = tk.Button(master, text="Close", command=master.quit)
-#         self.close_button.pack()
-#
-#     def greet(self):
-#         print("Greetings!")
-#
-#
-# def main():
-#     root = tk.Tk()
-#     my_gui = MyFirstGUI(root)
-#     root.mainloop()
-#
-#
-# if __name__ == '__main__':
-#     main()
-
-
-class Example(tk.Frame):
+class AppPwnRf:
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.style = ttk.Style()
         self.parent = parent
-        self.initUI()
+        self.parent.title("Pwn 2.4 Ghz")
 
-    def initUI(self):
-        self.parent.title("Quit button")
-        self.style.theme_use("default")
+        self.notebook_rf = ttk.Notebook(self.parent)
+        self.nb_zigbee  = ttk.Frame(self.notebook_rf)
+        self.nb_wifi = ttk.Frame(self.notebook_rf)
+        self.nb_settings = ttk.Frame(self.notebook_rf)
 
-        self.pack(fill=tk.BOTH, expand=1)
+        self.notebook_rf.add(self.nb_zigbee, text='Zigbee')
+        self.notebook_rf.add(self.nb_wifi, text='WiFi')
+        self.notebook_rf.add(self.nb_settings, text='Settings')
+        self.notebook_rf.grid(row=2, padx=10, pady=10)
 
-        quitButton = ttk.Button(self, text="Quit", command=self.quit)
-        quitButton.place(x=50, y=50)
+        self.zigbee_layer_l = tk.Label(self.nb_zigbee, text='Zigbee layer')
+        self.zigbee_layer_l.grid(pady=5)
 
+        self.zigbee_layer_combo = ttk.Combobox(self.nb_zigbee, value=['MAC', 'NWK', 'APS'])
+        self.zigbee_layer_combo.grid(row=1, pady=5)
+
+        self.l_raw_pkt = ttk.Label(self.parent, text="Raw packet:")
+        self.l_raw_pkt.grid(row=3, padx=10, sticky='w')
+        # self.l_raw_pkt.grid(row=3, padx=10)
+        self.entry_raw_pkt = ttk.Entry(self.parent)
+        self.entry_raw_pkt.grid(row=4, padx=10, sticky='we')
+
+        self.bttn_send = ttk.Button(self.parent, text='Send')
+        self.bttn_send.grid(row=4, column=2)
 
 def main():
     root = tk.Tk()
-    root.geometry("250x150+300+300")
-    app = Example(root)
-    # root.mainloop()
-
-
-    app.mainloop()
+    AppPwnRf(root)
+    root.mainloop()
 
 
 if __name__ == '__main__':
