@@ -10,6 +10,7 @@ import sys
 
 ZIGBEE_LAYER            = ['MAC', 'NWK', 'APS']
 ZIGBEE_MAC_TYPE         = ['BEACON', 'DATA', 'ACK', 'CMD']
+ZIGBEE_NWK_TYPE         = ['DATA', 'NWK_CMD', 'Inter-PAN', 'Reserved']
 ZIGBEE_MHR_FC_ADDR_MODE = ['NOT PAN/addr', '16 bit', '64 bit']
 ZIGBEE_MHR_FC_FRAME_VER = ['802.15.4-2003', '802.15.4']
 ZIGBEE_MAC_CMD_ID_CMD   = {
@@ -24,6 +25,19 @@ ZIGBEE_MAC_CMD_ID_CMD   = {
                             'GTS request'                   : 0x9,
                             'Reserved'                      : None
                             }
+ZIGBEE_NWK_CMD_ID       = {
+                            'Route request'                 : 0x1,
+                            'Route reply'                   : 0x2,
+                            'Network Status'                : 0x3,
+                            'Leave'                         : 0x4,
+                            'Route Record'                  : 0x5,
+                            'Rejoin request'                : 0x6,
+                            'Rejoin response'               : 0x7,
+                            'Link Status'                   : 0x8,
+                            'Network Report'                : 0x9,
+                            'Network Update'                : 0xA,
+                            'Reserved'                      : None
+                            }
 
 GUI_PAYLOAD_WIDTH   = 25
 
@@ -32,7 +46,7 @@ class AppPwnRf:
     def __init__(self, parent):
         self.parent = parent
         self.parent.title("Pwn 2.4 GHz")
-        self.parent.geometry("730x640")
+        # self.parent.geometry("730x640")
 
         self.notebook_rf = ttk.Notebook(self.parent)
         self.nb_zigbee  = ttk.Frame(self.notebook_rf)
@@ -54,19 +68,22 @@ class AppPwnRf:
 
         self.zigbee_layer_combo = ttk.Combobox(self.nb_zigbee, value=ZIGBEE_LAYER)
         self.zigbee_layer_combo.grid(row=1, padx=5, pady=5)
-        # self.zigbee_layer_combo.bind("<<ComboboxSelected>>", self.__set_zigbee_type, '+')
         self.zigbee_layer_combo.bind("<<ComboboxSelected>>", self.__set_zigbee_type)
 
         self.combo_zigbee_mac_type = ttk.Combobox(self.nb_zigbee, value=ZIGBEE_MAC_TYPE)
-        self.combo_zigbee_mac_type.grid(row=2, column=0, padx=5, columnspan=2, sticky='we')
+        self.combo_zigbee_mac_type.grid(row=2, column=0, padx=5, pady=5, columnspan=2, sticky='we')
         self.combo_zigbee_mac_type.bind("<<ComboboxSelected>>", self.__set_zigbee_mac_type_frame)
 
+        self.combo_zigbee_nwk_type = ttk.Combobox(self.nb_zigbee, value=ZIGBEE_NWK_TYPE)
+        self.combo_zigbee_nwk_type.grid(row=2, column=3, columnspan=2, padx=5, sticky='we')
+        self.combo_zigbee_nwk_type.bind("<<ComboboxSelected>>", self.__set_zigbee_nwk_type_frame)
 
         #############################
         ### 802.15.5 MAC header   ###
         #############################
         self.lf_zigbee_mhr = ttk.LabelFrame(self.nb_zigbee, text='MAC header')
-        self.lf_zigbee_mhr.grid(row=3, padx=5, pady=5, sticky='w')
+        self.lf_zigbee_mhr.grid(row=3, padx=5, pady=5, sticky='nw')
+        # self.lf_zigbee_mhr.grid(row=3, padx=5, sticky='w')
 
         #############################
         ### 802.15.4 MHR -> FC
@@ -209,6 +226,7 @@ class AppPwnRf:
         ### Zigbee NWK Header -> FC
         self.lf_zigbee_nwk_head = ttk.LabelFrame(self.nb_zigbee, text='NWK header')
         self.lf_zigbee_nwk_head.grid(row=3, column=3, padx=5, pady=5, sticky='n')
+        # self.lf_zigbee_nwk_head.grid(row=3, column=3, padx=5, sticky='n')
 
         self.lf_zigbee_nwkh_fc = ttk.LabelFrame(self.lf_zigbee_nwk_head, text='FC')
         self.lf_zigbee_nwkh_fc.grid(row=0, padx=5, pady=5, columnspan=2)
@@ -259,6 +277,61 @@ class AppPwnRf:
         self.l_zigbee_nwkh_seq_num.grid(row=4, column=1, sticky='w')
         self.e_zigbee_nwkh_seq_num = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
         self.e_zigbee_nwkh_seq_num.grid(row=4, column=0, padx=5, pady=5, sticky='w')
+
+        self.l_zigbee_nwkh_dst_ieee_addr = ttk.Label(self.lf_zigbee_nwk_head, text='Dst IEEE Addr')
+        self.l_zigbee_nwkh_dst_ieee_addr.grid(row=5, column=1, sticky='w')
+        self.e_zigbee_nwkh_dst_ieee_addr = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
+        self.e_zigbee_nwkh_dst_ieee_addr.grid(row=5, column=0, padx=5, sticky='w')
+
+        self.l_zigbee_nwkh_src_ieee_addr = ttk.Label(self.lf_zigbee_nwk_head, text='Src IEEE Addr')
+        self.l_zigbee_nwkh_src_ieee_addr.grid(row=6, column=1, sticky='w')
+        self.e_zigbee_nwkh_src_ieee_addr = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
+        self.e_zigbee_nwkh_src_ieee_addr.grid(row=6, column=0, padx=5, pady=5, sticky='w')
+
+        self.l_zigbee_nwkh_multicast_ctr = ttk.Label(self.lf_zigbee_nwk_head, text='Multicast Ctrl')
+        self.l_zigbee_nwkh_multicast_ctr.grid(row=7, column=1, sticky='w')
+        self.e_zigbee_nwkh_multicast_ctr = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
+        self.e_zigbee_nwkh_multicast_ctr.grid(row=7, column=0, padx=5, sticky='w')
+
+        self.l_zigbee_nwkh_src_route_subf = ttk.Label(self.lf_zigbee_nwk_head, text='Src Route Sub-frame')
+        self.l_zigbee_nwkh_src_route_subf.grid(row=8, column=1, sticky='w')
+        self.e_zigbee_nwkh_src_route_subf = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
+        self.e_zigbee_nwkh_src_route_subf.grid(row=8, column=0, padx=5, pady=5, sticky='w')
+        # self.e_zigbee_nwkh_src_route_subf.grid(row=8, column=0, padx=5, sticky='w')
+
+        #############################
+        ### Zigbee NWK PAYLOAD -> data
+
+        self.lf_zigbee_nwk_payload_data = ttk.LabelFrame(self.nb_zigbee, text='NWK Payload')
+        self.lf_zigbee_nwk_payload_data.grid(row=3, column=4, padx=5, pady=5, sticky='n')
+
+        self.l_zigbee_nwk_data_payload = ttk.Label(self.lf_zigbee_nwk_payload_data,
+                                                   text='Data payload',
+                                                   width=GUI_PAYLOAD_WIDTH)
+        self.l_zigbee_nwk_data_payload.grid(row=0, padx=5, pady=5)
+        self.e_zigbee_nwk_data_payload = ttk.Entry(self.lf_zigbee_nwk_payload_data, width=10)
+        self.e_zigbee_nwk_data_payload.grid(row=1, padx=5, pady=5, sticky='w')
+
+        #############################
+        ### Zigbee NWK PAYLOAD -> NWK cmd
+
+        self.lf_zigbee_nwk_payload_cmd = ttk.LabelFrame(self.nb_zigbee, text='NWK Payload')
+        self.lf_zigbee_nwk_payload_cmd.grid(row=3, column=4, padx=5, pady=5, sticky='n')
+
+        self.l_zigbee_nwk_id_cmd = ttk.Label(self.lf_zigbee_nwk_payload_cmd,
+                                                         text='NWK ID Cmd',
+                                                         width=GUI_PAYLOAD_WIDTH)
+        self.l_zigbee_nwk_id_cmd.grid(row=0, padx=5, pady=5)
+        self.combo_zigbee_nwk_id_cmd = ttk.Combobox(self.lf_zigbee_nwk_payload_cmd,
+                                                                     value=list(ZIGBEE_NWK_CMD_ID.keys()))
+        self.combo_zigbee_nwk_id_cmd.grid(row=1, padx=5, sticky='w')
+
+        self.l_zigbee_nwk_cmd_payload = ttk.Label(self.lf_zigbee_nwk_payload_cmd, text='NWK Cmd Payload')
+        self.l_zigbee_nwk_cmd_payload.grid(row=2, padx=5, pady=5, sticky='w')
+        self.e_zigbee_nwk_cmd_payload = ttk.Entry(self.lf_zigbee_nwk_payload_cmd, width=10)
+        self.e_zigbee_nwk_cmd_payload.grid(row=3, padx=5, pady=5, sticky='w')
+
+
 
 
         ####################
@@ -344,6 +417,22 @@ class AppPwnRf:
             self.lf_zigbee_mac_ack.grid_forget()
             self.lf_zigbee_mac_cmd.grid(row=3, column=1, padx=5, pady=5, sticky='n')
             self.lf_zigbee_mac_beacon.grid_forget()
+
+    def __set_zigbee_nwk_type_frame(self, event):
+        current_nwk_type = event.widget.get()
+        print(current_nwk_type)
+
+        if current_nwk_type == 'DATA':
+            self.lf_zigbee_nwk_payload_cmd.grid_remove()
+            self.lf_zigbee_nwk_payload_data.grid()
+
+        elif current_nwk_type == 'NWK_CMD':
+            self.lf_zigbee_nwk_payload_cmd.grid()
+            self.lf_zigbee_nwk_payload_data.grid_remove()
+
+        else:
+            self.lf_zigbee_nwk_payload_cmd.grid_remove()
+            self.lf_zigbee_nwk_payload_data.grid_remove()
 
 
 
