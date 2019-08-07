@@ -58,6 +58,11 @@ class AppPwnRf:
         self.notebook_rf.add(self.nb_settings, text='Settings')
         self.notebook_rf.grid(row=2, padx=10, pady=10)
 
+        ##################
+        ### Some variable
+        self.var = tk.IntVar()
+        # self.var = tk.BooleanVar()
+
 
         ####################
         ### Tab Zigbee   ###
@@ -90,8 +95,10 @@ class AppPwnRf:
         self.lf_zigbee_mhr_fc = ttk.LabelFrame(self.lf_zigbee_mhr, text='FC')
         self.lf_zigbee_mhr_fc.grid(row=0, padx=5, pady=5, columnspan=2)
 
-        self.c_zigbee_mhr_fc_sec_enable = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='En Security')
+        # self.c_zigbee_mhr_fc_sec_enable = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='Security Enabled', command=self.change_state)
+        self.c_zigbee_mhr_fc_sec_enable = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='Security Enabled', variable=self.var)
         self.c_zigbee_mhr_fc_sec_enable.grid(row=0, padx=5, columnspan=2, sticky='w')
+        self.c_zigbee_mhr_fc_sec_enable.bind('<Button-1>', self.__show_hide_zegbee_mhr_aux_sec)
 
         self.c_zigbee_mhr_fc_pending = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='Pending')
         self.c_zigbee_mhr_fc_pending.grid(row=1, padx=5, columnspan=2,  sticky='w')
@@ -151,10 +158,25 @@ class AppPwnRf:
         self.e_zigbee_mhr_src_addr = ttk.Entry(self.lf_zigbee_mhr, width=8)
         self.e_zigbee_mhr_src_addr.grid(row=5, column=0, padx=10, sticky='w')
 
-        self.l_zigbee_mhr_sec_header = ttk.Label(self.lf_zigbee_mhr, text='Security Header')
-        self.l_zigbee_mhr_sec_header.grid(row=6, column=1, sticky='w')
-        self.e_zigbee_mhr_sec_header = ttk.Entry(self.lf_zigbee_mhr, width=8)
-        self.e_zigbee_mhr_sec_header.grid(row=6, column=0, padx=10, pady=5, sticky='w')
+        #############################
+        ### 802.15.4 - MHR -> Aux security header
+        self.lf_zigbee_mhr_aux_sec = ttk.LabelFrame(self.lf_zigbee_mhr, text='Aux Security Header')
+        self.lf_zigbee_mhr_aux_sec.grid(row=6, padx=5, ipady=3, columnspan=2, sticky='w')
+
+        self.l_zigbee_mhr_auxsechdr_sec_control = ttk.Label(self.lf_zigbee_mhr_aux_sec, text='Security Control', width=15)
+        self.l_zigbee_mhr_auxsechdr_sec_control.grid(row=0, column=1, padx=5, sticky='w')
+        self.e_zigbee_mhr_auxsechdr_sec_control = ttk.Entry(self.lf_zigbee_mhr_aux_sec, width=8)
+        self.e_zigbee_mhr_auxsechdr_sec_control.grid(row=0, column=0, padx=5, pady=5, sticky='w')
+
+        self.l_zigbee_mhr_auxsechdr_frame_cnt = ttk.Label(self.lf_zigbee_mhr_aux_sec, text='Frame Counter')
+        self.l_zigbee_mhr_auxsechdr_frame_cnt.grid(row=1, column=1, padx=5, sticky='w')
+        self.e_zigbee_mhr_auxsechdr_frame_cnt = ttk.Entry(self.lf_zigbee_mhr_aux_sec, width=8)
+        self.e_zigbee_mhr_auxsechdr_frame_cnt.grid(row=1, column=0, padx=5, sticky='w')
+
+        self.l_zigbee_mhr_auxsechdr_key_ident = ttk.Label(self.lf_zigbee_mhr_aux_sec, text='Key Identifier')
+        self.l_zigbee_mhr_auxsechdr_key_ident.grid(row=2, column=1, padx=5, sticky='w')
+        self.e_zigbee_mhr_auxsechdr_key_ident = ttk.Entry(self.lf_zigbee_mhr_aux_sec, width=8)
+        self.e_zigbee_mhr_auxsechdr_key_ident.grid(row=2, column=0, padx=5, pady=5, sticky='w')
 
 
         #############################
@@ -354,6 +376,9 @@ class AppPwnRf:
         self.bttn_send.grid(row=4, column=2)
 
 
+
+
+
     @staticmethod
     def __get_serial_port():
         ports = []
@@ -433,6 +458,16 @@ class AppPwnRf:
         else:
             self.lf_zigbee_nwk_payload_cmd.grid_remove()
             self.lf_zigbee_nwk_payload_data.grid_remove()
+
+    def __show_hide_zegbee_mhr_aux_sec(self, event):
+        print(~self.var.get())
+        print(self.var)
+        show_hide_mhr_aux_sec = self.var.get()
+        if show_hide_mhr_aux_sec:
+            self.lf_zigbee_mhr_aux_sec.grid_remove()
+
+        else:
+            self.lf_zigbee_mhr_aux_sec.grid()
 
 
 
