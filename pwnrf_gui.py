@@ -13,31 +13,47 @@ ZIGBEE_MAC_TYPE         = ['BEACON', 'DATA', 'ACK', 'CMD']
 ZIGBEE_NWK_TYPE         = ['DATA', 'NWK_CMD', 'Inter-PAN', 'Reserved']
 ZIGBEE_MHR_FC_ADDR_MODE = ['NOT PAN/addr', '16 bit', '64 bit']
 ZIGBEE_MHR_FC_FRAME_VER = ['802.15.4-2003', '802.15.4']
-ZIGBEE_MAC_CMD_ID_CMD   = {
-                            'Association request'           : 0x1,
-                            'Association response'          : 0x2,
-                            'Disassociation notification'   : 0x3,
-                            'Data request'                  : 0x4,
-                            'PAN ID conflict'               : 0x5,
-                            'Orphan notification'           : 0x6,
-                            'Beacon request'                : 0x7,
-                            'Coordinator realignment'       : 0x8,
-                            'GTS request'                   : 0x9,
-                            'Reserved'                      : None
-                            }
-ZIGBEE_NWK_CMD_ID       = {
-                            'Route request'                 : 0x1,
-                            'Route reply'                   : 0x2,
-                            'Network Status'                : 0x3,
-                            'Leave'                         : 0x4,
-                            'Route Record'                  : 0x5,
-                            'Rejoin request'                : 0x6,
-                            'Rejoin response'               : 0x7,
-                            'Link Status'                   : 0x8,
-                            'Network Report'                : 0x9,
-                            'Network Update'                : 0xA,
-                            'Reserved'                      : None
-                            }
+
+ZIGBEE_MAC_CMD_ID_CMD           = {
+                                    'Association request'           : 0x1,
+                                    'Association response'          : 0x2,
+                                    'Disassociation notification'   : 0x3,
+                                    'Data request'                  : 0x4,
+                                    'PAN ID conflict'               : 0x5,
+                                    'Orphan notification'           : 0x6,
+                                    'Beacon request'                : 0x7,
+                                    'Coordinator realignment'       : 0x8,
+                                    'GTS request'                   : 0x9,
+                                    'Reserved'                      : None
+                                    }
+
+ZIGBEE_NWK_CMD_ID               = {
+                                    'Route request'                 : 0x1,
+                                    'Route reply'                   : 0x2,
+                                    'Network Status'                : 0x3,
+                                    'Leave'                         : 0x4,
+                                    'Route Record'                  : 0x5,
+                                    'Rejoin request'                : 0x6,
+                                    'Rejoin response'               : 0x7,
+                                    'Link Status'                   : 0x8,
+                                    'Network Report'                : 0x9,
+                                    'Network Update'                : 0xA,
+                                    'Reserved'                      : None
+                                    }
+
+ZIGBEE_APS_HEAD_FC_FRAME_TYPE   = {
+                                    'DATA'                          : 0x0,
+                                    'CMD'                           : 0x1,
+                                    'ACK'                           : 0x2,
+                                    'Reserved'                      : 0x3
+                                    }
+
+ZIGBEE_APS_HEAD_FC_DELIVERY_MODE = {
+                                    'Unicast'                       : 0x0,
+                                    'Reserved'                      : 0x1,
+                                    'Broadcast'                     : 0x2,
+                                    'Group addr'                    : 0x3
+                                    }
 
 GUI_PAYLOAD_WIDTH   = 25
 
@@ -95,7 +111,6 @@ class AppPwnRf:
         self.lf_zigbee_mhr_fc = ttk.LabelFrame(self.lf_zigbee_mhr, text='FC')
         self.lf_zigbee_mhr_fc.grid(row=0, padx=5, pady=5, columnspan=2)
 
-        # self.c_zigbee_mhr_fc_sec_enable = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='Security Enabled', command=self.change_state)
         self.c_zigbee_mhr_fc_sec_enable = ttk.Checkbutton(self.lf_zigbee_mhr_fc, text='Security Enabled', variable=self.var)
         self.c_zigbee_mhr_fc_sec_enable.grid(row=0, padx=5, columnspan=2, sticky='w')
         self.c_zigbee_mhr_fc_sec_enable.bind('<Button-1>', self.__show_hide_zegbee_mhr_aux_sec)
@@ -248,7 +263,7 @@ class AppPwnRf:
         ### Zigbee NWK Header -> FC
         self.lf_zigbee_nwk_head = ttk.LabelFrame(self.nb_zigbee, text='NWK header')
         self.lf_zigbee_nwk_head.grid(row=3, column=3, padx=5, pady=5, sticky='n')
-        # self.lf_zigbee_nwk_head.grid(row=3, column=3, padx=5, sticky='n')
+
 
         self.lf_zigbee_nwkh_fc = ttk.LabelFrame(self.lf_zigbee_nwk_head, text='FC')
         self.lf_zigbee_nwkh_fc.grid(row=0, padx=5, pady=5, columnspan=2)
@@ -353,6 +368,60 @@ class AppPwnRf:
         self.e_zigbee_nwk_cmd_payload = ttk.Entry(self.lf_zigbee_nwk_payload_cmd, width=10)
         self.e_zigbee_nwk_cmd_payload.grid(row=3, padx=5, pady=5, sticky='w')
 
+        #############################
+        ### Zigbee APS Layer     ###
+        #############################
+
+        self.lf_zigbee_aps_head = ttk.LabelFrame(self.nb_zigbee, text='APS header')
+        self.lf_zigbee_aps_head.grid(row=3, column=5, padx=5, pady=5, sticky='n')
+
+        #############################
+        ### Zigbee APS head - FC
+
+        self.lf_zigbee_apsh_fc = ttk.LabelFrame(self.lf_zigbee_aps_head, text='FC')
+        self.lf_zigbee_apsh_fc.grid(row=0, padx=5, pady=5, columnspan=2)
+
+        # self.l_zigbee_apsh_fc_frame_type = ttk.Label(self.lf_zigbee_apsh_fc, text='Frame type')
+        # self.l_zigbee_apsh_fc_frame_type.grid(row=0, column=1, padx=5, pady=5, sticky='w')
+        # self.combo_zigbee_apsh_fc_frame_type = ttk.Combobox(self.lf_zigbee_apsh_fc,
+        #                                                     value=list(ZIGBEE_APS_HEAD_FC_FRAME_TYPE.keys()),
+        #                                                     width=8)
+        # self.combo_zigbee_apsh_fc_frame_type.grid(row=0, column=0, padx=5)
+
+        self.l_zigbee_apsh_fc_delivery_mode = ttk.Label(self.lf_zigbee_apsh_fc, text='Delivery mode')
+        self.l_zigbee_apsh_fc_delivery_mode.grid(row=1, column=1, sticky='w')
+        self.combo_zigbee_apsh_fc_delivery_mode = ttk.Combobox(self.lf_zigbee_apsh_fc,
+                                                            value=list(ZIGBEE_APS_HEAD_FC_DELIVERY_MODE.keys()),
+                                                            width=10)
+        self.combo_zigbee_apsh_fc_delivery_mode.grid(row=1, column=0, padx=5, pady=5, sticky='w')
+
+        self.c_zigbee_apsh_fc_ack = ttk.Checkbutton(self.lf_zigbee_apsh_fc, text='ACK format')
+        self.c_zigbee_apsh_fc_ack.grid(row=2, padx=5, sticky='w')
+
+        self.c_zigbee_apsh_fc_security = ttk.Checkbutton(self.lf_zigbee_apsh_fc, text='Security')
+        self.c_zigbee_apsh_fc_security.grid(row=3, padx=5, sticky='w')
+
+        self.c_zigbee_apsh_fc_ack_request = ttk.Checkbutton(self.lf_zigbee_apsh_fc, text='ACK request')
+        self.c_zigbee_apsh_fc_ack_request.grid(row=4, padx=5, sticky='w')
+
+        self.c_zigbee_apsh_fc_ext_header = ttk.Checkbutton(self.lf_zigbee_apsh_fc, text='Ext header')
+        self.c_zigbee_apsh_fc_ext_header.grid(row=5, padx=5, sticky='w')
+
+        #############################
+        ### Zigbee APS head
+
+        self.l_zigbee_apsh_dst_endpoint = ttk.Label(self.lf_zigbee_aps_head, text='Dst endpoint')
+        self.l_zigbee_apsh_dst_endpoint.grid(row=1, column=1, sticky='w')
+        self.e_zigbee_apsh_dst_endpoint = ttk.Entry(self.lf_zigbee_aps_head, width=8)
+        self.e_zigbee_apsh_dst_endpoint.grid(row=1, column=0, padx=5, sticky='w')
+
+        self.l_zigbee_apsh_grp_addr = ttk.Label(self.lf_zigbee_aps_head, text='Grp addr')
+        self.l_zigbee_apsh_grp_addr.grid(row=2, column=1, sticky='w')
+        self.e_zigbee_apsh_grp_addr = ttk.Entry(self.lf_zigbee_aps_head, width=8)
+        self.e_zigbee_apsh_grp_addr.grid(row=2, column=0, padx=5, pady=5, sticky='w')
+
+
+
 
 
 
@@ -402,7 +471,7 @@ class AppPwnRf:
     def __set_zigbee_type(self, event):
         current_mac_type = event.widget.get()
         print(current_mac_type)
-        self.__show_mac_type()
+        # self.__show_mac_type()
 
         # if current_mac_type == 'MAC':
         #     # self.pane_zigbee_mac_header.grid()
@@ -460,8 +529,8 @@ class AppPwnRf:
             self.lf_zigbee_nwk_payload_data.grid_remove()
 
     def __show_hide_zegbee_mhr_aux_sec(self, event):
-        print(~self.var.get())
-        print(self.var)
+        # print(~self.var.get())
+        # print(self.var)
         show_hide_mhr_aux_sec = self.var.get()
         if show_hide_mhr_aux_sec:
             self.lf_zigbee_mhr_aux_sec.grid_remove()
