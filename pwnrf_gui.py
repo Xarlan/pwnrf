@@ -13,9 +13,7 @@ import lrwpan
 
 
 ZIGBEE_LAYER            = ['MAC', 'NWK', 'APS']
-# ZIGBEE_MAC_TYPE         = ['BEACON', 'DATA', 'ACK', 'CMD']
 ZIGBEE_NWK_TYPE         = ['DATA', 'NWK_CMD', 'Inter-PAN', 'Reserved']
-ZIGBEE_MHR_FC_ADDR_MODE = ['NOT PAN/addr', '16 bit', '64 bit']
 ZIGBEE_MHR_FC_FRAME_VER = ['802.15.4-2003', '802.15.4']
 
 ZIGBEE_MAC_CMD_ID_CMD           = {
@@ -162,7 +160,7 @@ class AppPwnRf:
                                                                  text='PAN ID Compres',
                                                                  variable=self.gui_z_mhr_fc_panid_compress,
                                                                  onvalue=0x0,
-                                                                 offvalue=0x40)
+                                                                 offvalue=0x40)                     # MHR -> FC -> b6
         self.c_zigbee_mhr_fc_panid_compression.grid(row=4, padx=5, columnspan=2,  sticky='w')
         self.gui_z_mhr_fc_panid_compress.set(0x40)
 
@@ -174,7 +172,7 @@ class AppPwnRf:
         self.l_zigbee_mhr_fc_dst_addr_mode = ttk.Label(self.lf_zigbee_mhr_fc, text='Dst Addr mode')
         self.l_zigbee_mhr_fc_dst_addr_mode.grid(row=6, column=1, padx=5, pady=5, sticky='w')
         self.combo_zigbee_mhr_fc_dst_addr_mode = ttk.Combobox(self.lf_zigbee_mhr_fc,
-                                                              values=ZIGBEE_MHR_FC_ADDR_MODE,
+                                                              values=list(lrwpan.IEEE_802_15_4_MAC_DST_ADDR_MODE.keys()),
                                                               width=10)
         self.combo_zigbee_mhr_fc_dst_addr_mode.grid(row=6, column=0, padx=5, pady=5, sticky='w')
 
@@ -188,7 +186,7 @@ class AppPwnRf:
         self.l_zigbee_mhr_fc_src_addr_mode = ttk.Label(self.lf_zigbee_mhr_fc, text='Src Addr mode')
         self.l_zigbee_mhr_fc_src_addr_mode.grid(row=8, column=1, padx=5, pady=5, sticky='w')
         self.combo_zigbee_mhr_fc_src_addr_mode = ttk.Combobox(self.lf_zigbee_mhr_fc,
-                                                              values=ZIGBEE_MHR_FC_ADDR_MODE,
+                                                              values=list(lrwpan.IEEE_802_15_4_MAC_SRC_ADDR_MODE.keys()),
                                                               width=10)
         self.combo_zigbee_mhr_fc_src_addr_mode.grid(row=8, padx=5, pady=5, sticky='w')
 
@@ -678,15 +676,11 @@ class AppPwnRf:
             self.lf_zigbee_nwk_payload_data.grid_remove()
 
     def __show_hide_zegbee_mhr_aux_sec(self, event):
-        print(self.gui_z_mhr_fc_security_enable.get())
-        # print(self.var)
-        show_hide_mhr_aux_sec = self.var.get()
-        if show_hide_mhr_aux_sec:
-            self.lf_zigbee_mhr_aux_sec.grid_remove()
-
-        else:
+        # value '0x8' - MHC -> FC - bit3: [Security Enabled]
+        if self.gui_z_mhr_fc_security_enable.get() == 0x8:
             self.lf_zigbee_mhr_aux_sec.grid()
-
+        else:
+            self.lf_zigbee_mhr_aux_sec.grid_remove()
 
 
 
