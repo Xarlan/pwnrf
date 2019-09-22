@@ -4,5 +4,4 @@
 
 __author__ = 'lem'
 
-from lrwpan.ieee802_15_4 import *
-from lrwpan.zigbee import *
+from ui import uzigbee

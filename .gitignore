@@ -1,3 +1,5 @@
 .idea/*
 lrwpan/__pycache__/
+ui/__pycache__/
+ui/uzigbee/__pycache__/
 
