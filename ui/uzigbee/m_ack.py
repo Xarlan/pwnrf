@@ -27,6 +27,8 @@ class MAck:
         self.l_zigbee_mac_ack = ttk.Label(self.lf_zigbee_mac_ack, text='No payload', width=GUI_PAYLOAD_WIDTH)
         self.l_zigbee_mac_ack.grid(row=0, padx=5, pady=5, sticky='w')
 
+        self.hide_mpayload()
+
 
     def show_mpayload(self):
         self.lf_zigbee_mac_ack.grid()

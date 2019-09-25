@@ -33,6 +33,8 @@ class NwkData:
         self.nwk_data_payload = ttk.Entry(self.lf_zigbee_nwk_payload_data, width=10)
         self.nwk_data_payload.grid(row=1, padx=5, pady=5, sticky='w')
 
+        self.hide_nwkpayload()
+
 
 
     def show_nwkpayload(self):

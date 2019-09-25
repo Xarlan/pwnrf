@@ -37,6 +37,8 @@ class MCmd:
         self.e_zigbee_mac_cmd_payload_cmd = ttk.Entry(self.lf_zigbee_mac_cmd, width=20)
         self.e_zigbee_mac_cmd_payload_cmd.grid(row=3, padx=5, pady=5, sticky='w')
 
+        self.hide_mpayload()
+
     def show_mpayload(self):
         self.lf_zigbee_mac_cmd.grid()
 

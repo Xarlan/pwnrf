@@ -114,6 +114,13 @@ class ApsHdr:
         self.ahdr_exthdr_ack_bit = ttk.Entry(self.lf_zigbee_apsh_ext_header, width=8)
         self.ahdr_exthdr_ack_bit.grid(row=2, column=0, padx=5)
 
+        self.hide_aps_hdr()
+
+    def show_aps_hdr(self):
+        self.lf_zigbee_aps_head.grid()
+
+    def hide_aps_hdr(self):
+        self.lf_zigbee_aps_head.grid_remove()
 
 if __name__ == '__main__':
     root = tk.Tk()

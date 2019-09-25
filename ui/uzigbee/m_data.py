@@ -29,6 +29,8 @@ class MData:
         self.e_zigbee_mac_data_payload = ttk.Entry(self.lf_zigbee_mac_data, width=20)
         self.e_zigbee_mac_data_payload.grid(row=1, padx=5, pady=5, sticky='w')
 
+        self.hide_mpayload()
+
     def show_mpayload(self):
         self.lf_zigbee_mac_data.grid()
 

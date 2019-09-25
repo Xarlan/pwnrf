@@ -12,6 +12,12 @@ ZIGBEE_NWK_FRAME_TYPE           = {                     # b1 b0
                                     'Reserved'  : 0x2,  #  1  0
                                     'Inter-PAN' : 0x3   #  1  1
                                     }
+ZIGBEE_NWK_FC_DISCOVER_ROUTE    = {
+                                    'Suppress route'  : 0x0,
+                                    'Enable route'    : 0x1,
+                                    'Reserved 0x2'              : 0x2,
+                                    'Reserved 0x3'              : 0x3,
+                                    }
 
 ZIGBEE_NWK_CMD_ID               = {
                                     'Route request'                 : 0x1,

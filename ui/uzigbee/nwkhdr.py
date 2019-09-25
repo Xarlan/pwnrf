@@ -52,10 +52,14 @@ class NwkHeader:
         self.nwkh_fc_proto_ver = ttk.Entry(self.lf_zigbee_nwkh_fc, width=8)
         self.nwkh_fc_proto_ver.grid(row=1, column=0, padx=5, sticky='w')
 
-        self.l_zigbee_nwkh_fc_discover_route = ttk.Label(self.lf_zigbee_nwkh_fc, text='Discover Route')
+        self.l_zigbee_nwkh_fc_discover_route = ttk.Label(self.lf_zigbee_nwkh_fc, text='Discover')
         self.l_zigbee_nwkh_fc_discover_route.grid(row=2, column=1, sticky='w')
-        self.nwkh_fc_discover_route = ttk.Entry(self.lf_zigbee_nwkh_fc, width=8)
+        self.nwkh_fc_discover_route = ttk.Combobox(self.lf_zigbee_nwkh_fc,
+                                                   values=list(sorted(lrwpan.ZIGBEE_NWK_FC_DISCOVER_ROUTE.keys())),
+                                                   width=10)
         self.nwkh_fc_discover_route.grid(row=2, column=0, padx=5, sticky='w')
+        # self.nwkh_fc_discover_route = ttk.Entry(self.lf_zigbee_nwkh_fc, width=8)
+        # self.nwkh_fc_discover_route.grid(row=2, column=0, padx=5, sticky='w')
 
         self.nwkh_fc_multicast = ttk.Checkbutton(self.lf_zigbee_nwkh_fc, text='Multicast Flag')
         self.nwkh_fc_multicast.grid(row=3, padx=5, columnspan=2, sticky='w')
@@ -91,6 +95,7 @@ class NwkHeader:
         self.l_zigbee_nwkh_dst_addr.grid(row=1, column=1, sticky='w')
         self.nwkh_dst_addr = ttk.Entry(self.lf_zigbee_nwk_head, width=8)
         self.nwkh_dst_addr.grid(row=1, column=0, padx=5, sticky='w')
+        # self.nwkh_dst_addr.bind('<FocusOut>', self.temp_fun)
 
         self.l_zigbee_nwkh_src_addr = ttk.Label(self.lf_zigbee_nwk_head, text='Src Addr')
         self.l_zigbee_nwkh_src_addr.grid(row=2, column=1, sticky='w')
@@ -128,10 +133,11 @@ class NwkHeader:
         self.nwkh_src_route_subf.grid(row=8, column=0, padx=5, pady=5, sticky='w')
 
         self._show_hide_ieee_addr()
+        self.hide_nwk_hdr()
 
     def _show_hide_ieee_addr(self):
 
-        # show / hide IEEE Dst Addr
+        # show / hide IEEE Dst Addr             NWK header -> FC -> b11
         if self.var_fc_dst_ieee_addr.get() == 0x800:
             self.nwkh_dst_ieee_addr.grid()
             self.l_zigbee_nwkh_dst_ieee_addr.grid()
@@ -139,7 +145,7 @@ class NwkHeader:
             self.nwkh_dst_ieee_addr.grid_remove()
             self.l_zigbee_nwkh_dst_ieee_addr.grid_remove()
 
-        # show / hide IEEE Src Addr
+        # show / hide IEEE Src Addr             NWK header -> FC -> b12
         if self.var_fc_src_ieee_addr.get() == 0x1000:
             self.nwkh_src_ieee_addr.grid()
             self.l_zigbee_nwkh_src_ieee_addr.grid()
@@ -147,6 +153,15 @@ class NwkHeader:
             self.nwkh_src_ieee_addr.grid_remove()
             self.l_zigbee_nwkh_src_ieee_addr.grid_remove()
 
+    def hide_nwk_hdr(self):
+        self.lf_zigbee_nwk_head.grid_remove()
+
+    def show_nwk_hdr(self):
+        self.lf_zigbee_nwk_head.grid()
+
+
+    # def temp_fun(self, event):
+    #     print("focus out")
 
 if __name__ == '__main__':
     root = tk.Tk()

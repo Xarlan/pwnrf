@@ -43,7 +43,7 @@ class Mhr:
         self.l_zigbee_mhr_fc_frame_type = ttk.Label(self.lf_zigbee_mhr_fc, text='Frame Type')
         self.l_zigbee_mhr_fc_frame_type.grid(row=0, column=1)
         self.mhdr_fc_frame_type = ttk.Combobox(self.lf_zigbee_mhr_fc,
-                                               value=list(lrwpan.IEEE_802_15_4_MAC_TYPE.keys()),
+                                               value=list(sorted(lrwpan.IEEE_802_15_4_MAC_TYPE.keys())),
                                                width=10)
         self.mhdr_fc_frame_type.grid(row=0, column=0, padx=5, pady=5, sticky='we')
 
@@ -89,8 +89,9 @@ class Mhr:
         self.l_zigbee_mhr_fc_dst_addr_mode = ttk.Label(self.lf_zigbee_mhr_fc, text='Dst Addr mode')
         self.l_zigbee_mhr_fc_dst_addr_mode.grid(row=6, column=1, padx=5, pady=5, sticky='w')
         self.mhdr_fc_dst_addr_mode = ttk.Combobox(self.lf_zigbee_mhr_fc,
-                                                  values=list(lrwpan.IEEE_802_15_4_MAC_DST_ADDR_MODE.keys()),
-                                                  width=10)
+                                                  values=list(sorted(lrwpan.IEEE_802_15_4_MAC_DST_ADDR_MODE.keys())),
+                                                  width=10,
+                                                  state='disabled')
         self.mhdr_fc_dst_addr_mode.grid(row=6, column=0, padx=5, pady=5, sticky='w')
 
         self.l_zigbee_mhr_fc_frame_ver = ttk.Label(self.lf_zigbee_mhr_fc, text='Frame version')
@@ -103,8 +104,9 @@ class Mhr:
         self.l_zigbee_mhr_fc_src_addr_mode = ttk.Label(self.lf_zigbee_mhr_fc, text='Src Addr mode')
         self.l_zigbee_mhr_fc_src_addr_mode.grid(row=8, column=1, padx=5, pady=5, sticky='w')
         self.mhdr_fc_src_addr_mode = ttk.Combobox(self.lf_zigbee_mhr_fc,
-                                                  values=list(lrwpan.IEEE_802_15_4_MAC_SRC_ADDR_MODE.keys()),
-                                                  width=10)
+                                                  values=list(sorted(lrwpan.IEEE_802_15_4_MAC_SRC_ADDR_MODE.keys())),
+                                                  width=10,
+                                                  state='disabled')
         self.mhdr_fc_src_addr_mode.grid(row=8, padx=5, pady=5, sticky='w')
 
         #############################
@@ -117,23 +119,25 @@ class Mhr:
 
         self.l_zigbee_mhr_dst_pan = ttk.Label(self.lf_zigbee_mhr, text='Dst PAN')
         self.l_zigbee_mhr_dst_pan.grid(row=2, column=1, sticky='w')
-        self.mhdr_dst_pan = ttk.Entry(self.lf_zigbee_mhr, width=8)
+        self.mhdr_dst_pan = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_dst_pan')
         self.mhdr_dst_pan.grid(row=2, column=0, padx=10, sticky='w')
 
         self.l_zigbee_mhr_dst_addr = ttk.Label(self.lf_zigbee_mhr, text='Dst addr')
         self.l_zigbee_mhr_dst_addr.grid(row=3, column=1, pady=5, sticky='w')
-        self.mhdr_dst_addr = ttk.Entry(self.lf_zigbee_mhr, width=8)
+        self.mhdr_dst_addr = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_dst_addr')
         self.mhdr_dst_addr.grid(row=3, column=0, padx=10, sticky='w')
+        self.mhdr_dst_addr.bind('<FocusOut>', self.set_mac_addr_mode)
 
         self.l_zigbee_mhr_src_pan = ttk.Label(self.lf_zigbee_mhr, text='Src PAN')
         self.l_zigbee_mhr_src_pan.grid(row=4, column=1, sticky='w')
-        self.mhdr_src_pan = ttk.Entry(self.lf_zigbee_mhr, width=8)
+        self.mhdr_src_pan = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_src_pan')
         self.mhdr_src_pan.grid(row=4, column=0, padx=10, sticky='w')
 
         self.l_zigbee_mhr_src_addr = ttk.Label(self.lf_zigbee_mhr, text='Src addr')
         self.l_zigbee_mhr_src_addr.grid(row=5, column=1, pady=5, sticky='w')
-        self.mhdr_src_addr = ttk.Entry(self.lf_zigbee_mhr, width=8)
+        self.mhdr_src_addr = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_src_addr')
         self.mhdr_src_addr.grid(row=5, column=0, padx=10, sticky='w')
+        self.mhdr_src_addr.bind('<FocusOut>', self.set_mac_addr_mode)
 
         #############################################
         ### 802.15.4 - MHR -> Aux security header ###
@@ -171,6 +175,45 @@ class Mhr:
         # print("AR = ", self.var_mhdr_fc_ar.get())
         # print("Pending = ", self.var_mhdr_fc_pending.get())
         # print("*****")
+
+    def set_mac_addr_mode(self, event):
+        raw_value = event.widget.get()
+        current_widget = event.widget.winfo_name()
+        try:
+            addr = lrwpan.Ieee802MacHdr.check_16bit_64bit_addr(raw_value)
+
+        except lrwpan.ValidationError as e:
+            print(e.msg)
+
+        else:
+            # Destination Addr mode
+            if current_widget == 'mac_dst_addr':
+                if isinstance(addr, int):                           # Create list element using "sorted"
+                    self.mhdr_fc_dst_addr_mode.current(0)           # 0 - it mean '16 bit'
+
+                elif isinstance(addr, list):
+                    self.mhdr_fc_dst_addr_mode.current(1)           # 1 - it mean '64 bit'
+
+                elif isinstance(addr, str) and len(addr) == 0:
+                    self.mhdr_fc_dst_addr_mode.current(2)           # 2 - it mean 'Not PAN/addr'
+
+                else:
+                    self.mhdr_fc_dst_addr_mode.set('unknown')
+
+            # Source Addr mode
+            elif current_widget == 'mac_src_addr':
+                if isinstance(addr, int):
+                    self.mhdr_fc_src_addr_mode.current(0)
+
+                elif isinstance(addr, list):
+                    self.mhdr_fc_src_addr_mode.current(1)
+
+                elif isinstance(addr, str) and len(addr) == 0:
+                    self.mhdr_fc_src_addr_mode.current(2)
+
+                else:
+                    self.mhdr_fc_src_addr_mode.set('unknown')
+
 
 
 if __name__ == '__main__':

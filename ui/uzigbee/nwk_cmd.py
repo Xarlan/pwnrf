@@ -39,6 +39,8 @@ class NwkCmd:
         self.nwk_cmd_payload = ttk.Entry(self.lf_zigbee_nwk_payload_cmd, width=10)
         self.nwk_cmd_payload.grid(row=3, padx=5, pady=5, sticky='w')
 
+        self.hide_nwkpayload()
+
     def show_nwkpayload(self):
         self.lf_zigbee_nwk_payload_cmd.grid()
 

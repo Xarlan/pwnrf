@@ -45,6 +45,12 @@ IEEE_802_15_4_MAC_CMD_ID           = {
                                     }
 
 
+class ValidationError(Exception):
+
+    def __init__(self, msg='Validation Error'):
+        self.msg = msg
+
+
 class Ieee802MacHdr:
     """
     Basic class, Consist field for IEEE 802.15.4 MAC Header
@@ -82,6 +88,40 @@ class Ieee802MacHdr:
         mac_hdr.append((mac_fc & 0xFF00) >> 8)
 
         return mac_hdr
+
+    @staticmethod
+    def check_16bit_64bit_addr(raw_addr):
+
+        if isinstance(raw_addr, int):
+            if raw_addr in range(0, 0x10000):
+                return raw_addr
+            else:
+                raise ValidationError('[short address] wrong value')
+
+
+        elif isinstance(raw_addr, str):
+            if raw_addr and len(raw_addr) > 0:
+                try:
+                    addr = [int(x, 16) for x in raw_addr.split(":")]
+
+                except ValueError:
+                    raise ValidationError('[IEEE addr] wrong value')
+
+                else:
+                    if (len(addr) == 8) and (all(i <= 0xFF for i in addr)):
+                            return addr
+
+                    elif len(addr) == 1 and addr[0] <= 0x10000:
+                        return addr[0]
+
+                    else:
+                        raise ValidationError('[addr] wrong value')
+
+            elif len(raw_addr) == 0:
+                return raw_addr
+        else:
+            raise ValidationError('[IEEE addr] or [short addr] wrong value')
+
 
 
 class Ieee802Ack(Ieee802MacHdr):

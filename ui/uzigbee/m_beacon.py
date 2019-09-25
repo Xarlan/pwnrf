@@ -46,6 +46,8 @@ class MBeacon:
         self.e_zigbee_mac_beacon_payload_beacon = ttk.Entry(self.lf_zigbee_mac_beacon, width=8)
         self.e_zigbee_mac_beacon_payload_beacon.grid(row=7, padx=5, sticky='w')
 
+        self.hide_mpayload()
+
     def show_mpayload(self):
         self.lf_zigbee_mac_beacon.grid()
 
