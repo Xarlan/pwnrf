@@ -82,7 +82,7 @@ class AppPwnRf:
         self.entry_raw_pkt = ttk.Entry(self.parent)
         self.entry_raw_pkt.grid(row=4, padx=10, sticky='we')
 
-        self.bttn_send = ttk.Button(self.parent, text='Send')
+        self.bttn_send = ttk.Button(self.parent, text='Send', command=self.send_frame)
         self.bttn_send.grid(row=4, column=2)
 
 
@@ -124,10 +124,6 @@ class AppPwnRf:
 
     def _set_mac_type_frame(self, event):
         current_mac_type = event.widget.get()
-        # print(current_mac_type)
-        # print(self.parent.winfo_width())
-
-        # print(self.gui_mhr.mhdr_fc_pending.get())
 
         if current_mac_type == 'BEACON':
             self.gui_mbeacon.show_mpayload()
@@ -135,7 +131,6 @@ class AppPwnRf:
             self.gui_mcmd.hide_mpayload()
             self.gui_mdata.hide_mpayload()
             self.gui_mack.hide_mpayload()
-
 
         elif current_mac_type == 'DATA':
             self.gui_mdata.show_mpayload()
@@ -174,6 +169,29 @@ class AppPwnRf:
             self.gui_ndata.hide_nwkpayload()
             self.gui_ncmd.hide_nwkpayload()
 
+    def send_frame(self):
+        zigbee_layer = self.zigbee_layer_combo.get()
+
+        if zigbee_layer == 'MAC':
+            frame_type = self.gui_mhr.mhdr_fc_frame_type.get()
+            print(frame_type)
+
+            pkt_header = lrwpan.Ieee802MacHdr(frame_type)
+
+
+
+            if frame_type == 'BEACON':
+                pass
+
+            elif frame_type == 'DATA':
+                pass
+
+            elif frame_type == 'ACK':
+                pass
+
+            elif frame_type == 'CMD':
+                packet = lrwpan.Ieee802Cmd()
+                packet.magic_var = 4
 
 
 def main():

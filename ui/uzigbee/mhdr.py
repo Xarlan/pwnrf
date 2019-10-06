@@ -83,7 +83,7 @@ class Mhr:
 
         self.l_zigbee_mhr_fc_reserved = ttk.Label(self.lf_zigbee_mhr_fc, text='Reserved')
         self.l_zigbee_mhr_fc_reserved.grid(row=5, column=1, padx=5, sticky='w')
-        self.mhdr_fc_reserved = ttk.Entry(self.lf_zigbee_mhr_fc, width=10)
+        self.mhdr_fc_reserved = ttk.Entry(self.lf_zigbee_mhr_fc, width=10, state='disabled')
         self.mhdr_fc_reserved.grid(row=5, column=0, padx=5, pady=5, sticky='w')
 
         self.l_zigbee_mhr_fc_dst_addr_mode = ttk.Label(self.lf_zigbee_mhr_fc, text='Dst Addr mode')
@@ -121,6 +121,7 @@ class Mhr:
         self.l_zigbee_mhr_dst_pan.grid(row=2, column=1, sticky='w')
         self.mhdr_dst_pan = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_dst_pan')
         self.mhdr_dst_pan.grid(row=2, column=0, padx=10, sticky='w')
+        self.mhdr_dst_pan.bind('<FocusOut>', self.check_pan_id)
 
         self.l_zigbee_mhr_dst_addr = ttk.Label(self.lf_zigbee_mhr, text='Dst addr')
         self.l_zigbee_mhr_dst_addr.grid(row=3, column=1, pady=5, sticky='w')
@@ -132,6 +133,7 @@ class Mhr:
         self.l_zigbee_mhr_src_pan.grid(row=4, column=1, sticky='w')
         self.mhdr_src_pan = ttk.Entry(self.lf_zigbee_mhr, width=8, name='mac_src_pan')
         self.mhdr_src_pan.grid(row=4, column=0, padx=10, sticky='w')
+        self.mhdr_src_pan.bind('<FocusOut>', self.check_pan_id)
 
         self.l_zigbee_mhr_src_addr = ttk.Label(self.lf_zigbee_mhr, text='Src addr')
         self.l_zigbee_mhr_src_addr.grid(row=5, column=1, pady=5, sticky='w')
@@ -171,16 +173,19 @@ class Mhr:
         else:
             self.lf_zigbee_mhr_aux_sec.grid_remove()
 
-        # print("Pan ID Compress = ", self.var_mhdr_fc_panid_compress.get())
-        # print("AR = ", self.var_mhdr_fc_ar.get())
-        # print("Pending = ", self.var_mhdr_fc_pending.get())
-        # print("*****")
-
     def set_mac_addr_mode(self, event):
         raw_value = event.widget.get()
         current_widget = event.widget.winfo_name()
+
+        # try:
+        #     addr = lrwpan.Ieee802MacHdr.validate_16bits(raw_value, current_widget)
+        #
+        # except lrwpan.ValidationError as e:
+        #     print(e.msg)
+
         try:
-            addr = lrwpan.Ieee802MacHdr.check_16bit_64bit_addr(raw_value)
+            # addr = lrwpan.Ieee802MacHdr.check_16bit_64bit_addr(raw_value)
+            addr = lrwpan.Ieee802MacHdr.validate_mac_addr(raw_value, current_widget)
 
         except lrwpan.ValidationError as e:
             print(e.msg)
@@ -194,7 +199,8 @@ class Mhr:
                 elif isinstance(addr, list):
                     self.mhdr_fc_dst_addr_mode.current(1)           # 1 - it mean '64 bit'
 
-                elif isinstance(addr, str) and len(addr) == 0:
+                # elif isinstance(addr, str) and len(addr) == 0:
+                elif addr is None:
                     self.mhdr_fc_dst_addr_mode.current(2)           # 2 - it mean 'Not PAN/addr'
 
                 else:
@@ -214,6 +220,9 @@ class Mhr:
                 else:
                     self.mhdr_fc_src_addr_mode.set('unknown')
 
+    def check_pan_id(self, event):
+        raw_value = event.widget.get()
+        print(raw_value)
 
 
 if __name__ == '__main__':
