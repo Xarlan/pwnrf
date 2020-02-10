@@ -2,4 +2,8 @@
 lrwpan/__pycache__/
 ui/__pycache__/
 ui/uzigbee/__pycache__/
+esp32/build
+esp32/.settings
+esp32/.cproject
+esp32/.project
 

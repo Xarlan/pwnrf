@@ -141,6 +141,7 @@ class AppPwnRf:
 
         elif current_mac_type == 'ACK':
             self.gui_mack.show_mpayload()
+            self.gui_mhr.enable_disable_ack_field()
 
             self.gui_mdata.hide_mpayload()
             self.gui_mcmd.hide_mpayload()
@@ -178,6 +179,8 @@ class AppPwnRf:
 
             pkt_header = lrwpan.Ieee802MacHdr(frame_type)
 
+            # for key in pkt_header.key():
+            #     print(key)
 
 
             if frame_type == 'BEACON':
@@ -191,6 +194,11 @@ class AppPwnRf:
 
             elif frame_type == 'CMD':
                 packet = lrwpan.Ieee802Cmd()
+                for key in self.gui_mhr.__dict__:
+                    try:
+                        print(key, '=', getattr(self.gui_mhr, key).get())
+                    except AttributeError:
+                        pass
                 packet.magic_var = 4
 
 

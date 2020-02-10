@@ -6,6 +6,7 @@ __author__ = 'lem'
 
 import struct
 
+
 # ZIGBEE_LAYER            = ['MAC', 'NWK', 'APS']
 IEEE_802_15_4_FC_FRAME_VER = ['802.15.4-2003', '802.15.4']
 
@@ -194,6 +195,7 @@ class Ieee802MacHdr:
     def validate_bytes(raw_value, name_field='no name', addr_64bits=True):
         """
         Check if Src/Dst addr is correct 64 bit address
+        :param addr_64bits: Check IEEE 64 bits address or check stream of bytes
         :param raw_value:   raw input addr
         :param name_field:  which field is checked
         :return:            correct address
@@ -234,7 +236,7 @@ class Ieee802MacHdr:
             mac_addr = Ieee802MacHdr.validate_16bits(raw_value, name_field)
 
         except ValidationError as e:
-            mac_addr = Ieee802MacHdr.validate_64bits_addr(raw_value, name_field)
+            mac_addr = Ieee802MacHdr.validate_bytes(raw_value, name_field)
 
         return mac_addr
 

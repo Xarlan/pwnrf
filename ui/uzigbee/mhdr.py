@@ -165,6 +165,8 @@ class Mhr:
 
         self.show_hide_mhr_aux_sec()
 
+        # getattr(self, key).get()
+
     def show_hide_mhr_aux_sec(self):
         # value '0x8' - MHC -> FC - bit3: [Security Enabled]
         if self.var_mhdr_fc_security_enable.get() == 0x8:
@@ -214,7 +216,8 @@ class Mhr:
                 elif isinstance(addr, list):
                     self.mhdr_fc_src_addr_mode.current(1)
 
-                elif isinstance(addr, str) and len(addr) == 0:
+                # elif isinstance(addr, str) and len(addr) == 0:
+                elif addr is None:
                     self.mhdr_fc_src_addr_mode.current(2)
 
                 else:
@@ -223,6 +226,24 @@ class Mhr:
     def check_pan_id(self, event):
         raw_value = event.widget.get()
         print(raw_value)
+
+    def enable_disable_ack_field(self):
+        self.var_mhdr_fc_security_enable.set(0x0)
+        self.var_mhdr_fc_pending.set(0x0)
+        self.var_mhdr_fc_ar.set(0x0)
+        self.var_mhdr_fc_panid_compress.set(0x0)
+
+        self.mhdr_fc_sec_enable.config(state='disabled')
+        self.mhdr_fc_pending.config(state='disabled')
+        self.mhdr_fc_ar.config(state='disabled')
+        self.mhdr_fc_panid_compression.config(state='disabled')
+        self.mhdr_fc_frame_ver.config(state='disabled')
+
+        self.mhdr_dst_pan.config(state='disabled')
+        self.mhdr_dst_addr.config(state='disabled')
+        self.mhdr_src_pan.config(state='disabled')
+        self.mhdr_src_addr.config(state='disabled')
+
 
 
 if __name__ == '__main__':
